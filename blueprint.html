@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blueprint — Jornada de Análise de Dados com IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a2e;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .slides-container {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 1400%;
+        }
+
+        .slide {
+            width: calc(100% / 14);
+            flex-shrink: 0;
+            padding: 20px 40px 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 32px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-dot.exists { background: #40c057; }
+        .legend-dot.adaptation { background: #fab005; }
+        .legend-dot.new { background: #e64980; }
+
+        .blueprint {
+            display: grid;
+            grid-template-columns: 130px 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 0;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        .lane-header {
+            padding: 18px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-right: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+
+        .lane-header.actor { background: #e8f4fd; color: #1971c2; }
+        .lane-header.action { background: #fff3e0; color: #e65100; }
+        .lane-header.front { background: #fff3e0; color: #e65100; }
+        .lane-header.back { background: #f3e5f5; color: #6a1b9a; }
+        .lane-header.support { background: #fce4ec; color: #c62828; }
+
+        .moment-header {
+            padding: 16px 18px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .cell {
+            padding: 18px 20px;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #e9ecef;
+            font-size: 14px;
+            line-height: 1.6;
+            vertical-align: top;
+        }
+
+        .cell:last-child {
+            border-right: none;
+        }
+
+        .cell-item {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: #edf0f3;
+            border-left: 3px solid #dee2e6;
+        }
+
+        .cell-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .cell-item.exists { border-left-color: #40c057; }
+        .cell-item.adaptation { border-left-color: #fab005; }
+        .cell-item.new { border-left-color: #e64980; }
+
+        .cell-item .service-tag {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .row-support .service-tag {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .service-tag.exists { background: #d3f9d8; color: #2b8a3e; }
+        .service-tag.adaptation { background: #fff3bf; color: #e67700; }
+        .service-tag.new { background: #ffdeeb; color: #c2255c; }
+
+        .service-tag[data-detail] {
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .service-tag[data-detail]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .chip-popover {
+            display: none;
+            position: fixed;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            width: 280px;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+        .chip-popover .popover-title {
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0.7;
+        }
+
+        .chip-popover .popover-body {
+            margin-bottom: 8px;
+        }
+
+        .chip-popover .popover-status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .chip-popover .popover-status.new { background: #ffdeeb; color: #c2255c; }
+        .chip-popover .popover-status.exists { background: #d3f9d8; color: #2b8a3e; }
+        .chip-popover .popover-status.adaptation { background: #fff3bf; color: #e67700; }
+
+        .actor-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .actor-tag.user { background: #dbe4ff; color: #364fc7; }
+        .actor-tag.ai { background: #e8d5f5; color: #6a1b9a; }
+
+        .row-actor { }
+        .row-actor .cell-item { border-left-color: #74b9ff; }
+        .row-front { }
+        .row-front .cell-item { border-left-color: #ffb74d; }
+        .row-back { }
+        .row-back .cell-item { border-left-color: #b197fc; }
+        .row-support {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-content: flex-start;
+        }
+
+        .empty-cell {
+            color: #adb5bd;
+            font-style: italic;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .header-row .subtitle {
+            margin-bottom: 0;
+        }
+
+        .next-stage {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .next-stage-label {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .next-stage-label strong {
+            color: #1a1a2e;
+        }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: #1a1a2e;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-next:hover {
+            background: #2d2d44;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: transparent;
+            color: #1a1a2e;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+        }
+
+        .btn-back:hover {
+            background: #f1f3f5;
+            border-color: #adb5bd;
+        }
+
+        .btn-back.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .page-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .step-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 40px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 46px;
+            z-index: 99;
+            overflow-x: auto;
+        }
+
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid #dee2e6;
+            background: #fff;
+            color: #6c757d;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .step-dot:hover {
+            border-color: #1a1a2e;
+            color: #1a1a2e;
+        }
+
+        .step-dot.active {
+            background: #1a1a2e;
+            border-color: #1a1a2e;
+            color: #fff;
+        }
+
+        .step-connector {
+            width: 12px;
+            height: 2px;
+            background: #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .page-title-text {
+            flex-shrink: 0;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .nav-controls .next-stage-label {
+            color: #6c757d;
+        }
+
+        .nav-controls .next-stage-label strong {
+            color: #1a1a2e;
+        }
+
+        @media (max-width: 1200px) {
+            body { padding: 16px; }
+            .blueprint {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-title">
+    <span class="page-title-text">Blueprint — Jornada de Análise de Dados com IA</span>
+    <div class="nav-controls">
+        <button class="btn-back hidden" id="btnBack" onclick="goToPrev()">← Voltar</button>
+        <span class="next-stage-label" id="navLabel">Próxima etapa: <strong id="navNextName">Setup do Ambiente</strong></span>
+        <button class="btn-next" id="btnNext" onclick="goToNext()">Avançar →</button>
+    </div>
+</div>
+
+<div class="step-nav" id="stepNav">
+    <div class="step-dot active" onclick="goToSlide(0)" title="Instalação do Power de Dados">1</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(1)" title="Setup do Ambiente">2</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(2)" title="Carga do Contexto de Negócio">3</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(3)" title="Exploração">4</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(4)" title="Pergunta">5</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(5)" title="Seleção da Base">6</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(6)" title="Criar Query">7</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(7)" title="Executar Query">8</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(8)" title="Validação da Qualidade">9</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(9)" title="Gerar Insights">10</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(10)" title="Análise Crítica">11</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(11)" title="Gerar Saídas">12</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(12)" title="Distribuição e Gestão do Conhecimento">13</div><div class="step-connector"></div>
+    <div class="step-dot" onclick="goToSlide(13)" title="Automação">14</div>
+</div>
+
+<div class="slides-container" id="slidesContainer">
+
+<!-- SLIDE 1: Instalação do Power de Dados -->
+<div class="slide" id="slide-1">
+
+<h1>Etapa 1 — Instalação do Power de Dados</h1>
+<p class="subtitle">Jornada de Análise de Dados · DCP for Agents · Cenário Proposto</p>
+
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+
+<div class="blueprint">
+
+    <!-- Header Row -->
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Solicita configuração</div>
+    <div class="moment-header">2. IA configura ambiente</div>
+    <div class="moment-header">3. Autenticação</div>
+    <div class="moment-header">4. Detecta perfil e datasources</div>
+    <div class="moment-header">5. Acesso adicional</div>
+    <div class="moment-header">6. Aprovação</div>
+
+    <!-- ATOR ROW -->
+    <div class="lane-header actor">Ator</div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag user">Usuário</span><br>
+            Envia mensagem na IDE: "Configure essa conexão para mim: github.com/Hotmart-Org/mcp-hotmart-data"
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Monta e salva a configuração do MCP Server no arquivo correto da IDE
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item exists">
+            <span class="actor-tag user">Usuário</span><br>
+            Clica no link de login Okta que a IA abre; insere credenciais corporativas
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Consulta o perfil do usuário autenticado e identifica quais datasources estão disponíveis
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag user">Usuário</span><br>
+            Pede acesso a um datasource que não está na lista: "Preciso acessar dados de retenção do Club"
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Notifica o usuário quando o acesso adicional é aprovado
+        </div>
+    </div>
+
+    <!-- FRONTSTAGE ROW -->
+    <div class="lane-header front">Frontstage</div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Vou configurar o MCP Server de dados da Hotmart para você. Um momento."
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Configuração salva. Agora preciso que você faça login para autenticar a conexão."
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item exists">
+            Tela de autenticação Okta no browser (padrão corporativo) com redirecionamento automático de volta para a IDE após login
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Pronto! Você está conectado aos dados da Hotmart. Datasources disponíveis: DHI_DATA_GOLD, DHI_DATA_DIAMOND. Quer explorar algum dado?"
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "O datasource X contém dados de retenção por cohort. Quer que eu solicite acesso para você?"
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Seu acesso ao datasource X foi aprovado. Já está disponível para uso."
+        </div>
+    </div>
+
+    <!-- BACKSTAGE ROW -->
+    <div class="lane-header back">Backstage</div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            IA acessa o repositório no GitHub, lê o README, identifica que é um MCP Server e extrai a configuração necessária (URL do servidor, protocolo, variáveis de ambiente)
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            IA escreve o bloco de configuração no mcp.json (Kiro) ou claude_desktop_config.json (Claude Desktop), apontando para o MCP Server remoto de dados
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            MCP Server remoto recebe o token OAuth2 do Okta, valida identidade, emite access token + refresh token, armazena credenciais de forma segura (keychain do sistema)
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            MCP Auto-Config API identifica o role/time do usuário (via claims do Okta), consulta o Profile-to-Datasource Mapping, retorna lista de datasources autorizados
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            IA chama a Access Request API que cria ticket automático no Jira, notifica o owner do datasource, e registra a solicitação com status "pendente"
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            Access Request API recebe callback de aprovação do Jira, atualiza a lista de datasources disponíveis para o usuário no MCP Server
+        </div>
+        <div class="cell-item adaptation">
+            Jira workflow de aprovação aciona callback
+        </div>
+    </div>
+
+    <!-- SUPORTE ROW -->
+    <div class="lane-header support">Suporte</div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Repositório GitHub com README padronizado contendo instruções de configuração do MCP Server, URL do endpoint, protocolo e variáveis de ambiente." data-status="new">Repo GitHub padronizado</span>
+        <span class="service-tag exists" data-detail="Acesso ao repositório da Org Hotmart no GitHub. Já utilizado para versionamento de código." data-status="exists">GitHub Org</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="MCP Server remoto de Dados que conecta a IDE aos datasources corporativos via SSE/HTTP. Endpoint central de orquestração." data-status="new">MCP Server de Dados</span>
+        <span class="service-tag exists" data-detail="Sistema de arquivos local da IDE onde a configuração do MCP é salva (mcp.json, claude_desktop_config.json)." data-status="exists">FS local da IDE</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Provedor de identidade corporativo (SSO/OAuth2). Já utilizado para autenticação em todos os sistemas Hotmart." data-status="exists">Okta (SSO/OAuth2)</span>
+        <span class="service-tag new" data-detail="Token Service que emite access tokens com refresh automático, eliminando reautenticações frequentes. Armazena credenciais no keychain do sistema." data-status="new">OAuth2 Token Service</span>
+        <span class="service-tag exists" data-detail="Keychain do sistema operacional para armazenamento seguro de tokens e credenciais." data-status="exists">Keychain</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="API que consulta o perfil do usuário (role/time via claims do Okta) e retorna automaticamente a configuração de datasources autorizados." data-status="new">MCP Auto-Config API</span>
+        <span class="service-tag new" data-detail="Tabela de mapeamento que relaciona perfis (roles/times) aos datasources que cada um pode acessar." data-status="new">Profile-to-Datasource Mapping</span>
+        <span class="service-tag exists" data-detail="Claims do Okta contendo role e time do usuário, usados para identificação automática do perfil." data-status="exists">Okta claims</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Endpoint que cria solicitações de acesso a datasources, gera ticket automático no Jira e notifica o owner do datasource." data-status="new">Access Request API</span>
+        <span class="service-tag exists" data-detail="Jira Service Desk já utilizado para gestão de tickets e solicitações internas." data-status="exists">Jira Service Desk</span>
+        <span class="service-tag adaptation" data-detail="Notificação automática ao owner do datasource quando uma solicitação de acesso é criada. Adaptação do fluxo existente." data-status="adaptation">Notificação ao owner</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Access Request API recebe callback de aprovação e atualiza datasources disponíveis para o usuário no MCP Server." data-status="new">Access Request API</span>
+        <span class="service-tag adaptation" data-detail="Workflow de aprovação existente no Jira, adaptado para enviar callback automático após aprovação/rejeição." data-status="adaptation">Jira workflow</span>
+        <span class="service-tag new" data-detail="MCP Auto-Config API atualiza a lista de datasources do usuário após aprovação do acesso." data-status="new">MCP Auto-Config API</span>
+    </div>
+
+</div>
+</div><!-- end slide-1 -->
+
+<!-- SLIDE 2: Setup do Ambiente -->
+<div class="slide" id="slide-2">
+
+<h1>Etapa 2 — Setup do Ambiente</h1>
+<p class="subtitle">Autenticação e Conexão · DCP for Agents · Cenário Proposto</p>
+
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+
+    <!-- Header Row -->
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Verifica conexão</div>
+    <div class="moment-header">2. Conexão caiu</div>
+    <div class="moment-header">3. Reautenticação</div>
+
+    <!-- ATOR ROW -->
+    <div class="lane-header actor">Ator</div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Ao iniciar nova sessão, verifica automaticamente se a conexão com o MCP Server de dados está ativa
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Detecta que a conexão caiu e notifica o usuário
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item exists">
+            <span class="actor-tag user">Usuário</span><br>
+            Confirma reautenticação e faz login via Okta novamente
+        </div>
+    </div>
+
+    <!-- FRONTSTAGE ROW -->
+    <div class="lane-header front">Frontstage</div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            Indicador visual de status da conexão (ícone verde na barra lateral) — tudo funcionando silenciosamente
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Sua sessão com os dados da Hotmart precisa ser renovada. Posso reautenticar agora?"
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item exists">
+            Janela Okta abre no browser; após login: "Conexão restabelecida."
+        </div>
+    </div>
+
+    <!-- BACKSTAGE ROW -->
+    <div class="lane-header back">Backstage</div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            Health Check Service verifica validade do access token; se válido, sessão prossegue; se próximo de expirar, aciona refresh automático
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            Health Check detectou falha no refresh token (revogação ou expiração longa); prepara novo fluxo OAuth2
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            Novo par access token + refresh token é emitido e armazenado no keychain do sistema
+        </div>
+    </div>
+
+    <!-- SUPORTE ROW -->
+    <div class="lane-header support">Suporte</div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Serviço que verifica periodicamente a validade do token e a conectividade com o MCP Server. Aciona refresh automático quando necessário." data-status="new">Health Check Service</span>
+        <span class="service-tag new" data-detail="Token Service com refresh automático. Renova access tokens sem intervenção do usuário." data-status="new">OAuth2 Token Service</span>
+        <span class="service-tag new" data-detail="MCP Server remoto de Dados. Endpoint central que conecta a IDE aos datasources corporativos." data-status="new">MCP Server de Dados</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Health Check detecta falhas de conexão e prepara fluxo de reautenticação quando o refresh token é revogado." data-status="new">Health Check Service</span>
+        <span class="service-tag new" data-detail="OAuth2 Token Service identifica que o refresh token foi revogado e inicia novo fluxo de autenticação." data-status="new">OAuth2 Token Service</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Provedor de identidade corporativo (SSO/OAuth2). Já utilizado para autenticação em todos os sistemas Hotmart." data-status="exists">Okta (SSO/OAuth2)</span>
+        <span class="service-tag new" data-detail="Token Service emite novo par de tokens após reautenticação bem-sucedida." data-status="new">OAuth2 Token Service</span>
+        <span class="service-tag exists" data-detail="Keychain do sistema operacional para armazenamento seguro de tokens e credenciais." data-status="exists">Keychain</span>
+    </div>
+
+</div>
+</div><!-- end slide-2 -->
+
+<!-- SLIDE 3: Carga do Contexto de Negócio -->
+<div class="slide" id="slide-3">
+
+<h1>Etapa 3 — Carga do Contexto de Negócio</h1>
+<p class="subtitle">Contexto institucional e personalização · DCP for Agents · Cenário Proposto</p>
+
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+
+    <!-- Header Row -->
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Carrega contexto institucional</div>
+    <div class="moment-header">2. Usuário complementa contexto</div>
+    <div class="moment-header">3. Exploração do glossário</div>
+
+    <!-- ATOR ROW -->
+    <div class="lane-header actor">Ator</div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag ai">IA</span><br>
+            Ao iniciar interação sobre dados, carrega automaticamente o contexto de negócio relevante para o perfil do usuário
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item new">
+            <span class="actor-tag user">Usuário</span><br>
+            Adiciona contexto específico que a base institucional não cobre: "Na minha squad, 'ativo' significa quem logou nos últimos 7 dias"
+        </div>
+    </div>
+
+    <div class="cell row-actor">
+        <div class="cell-item exists">
+            <span class="actor-tag user">Usuário</span><br>
+            Pergunta: "Quais métricas o meu time costuma acompanhar?" ou "O que significa churn na Hotmart?"
+        </div>
+    </div>
+
+    <!-- FRONTSTAGE ROW -->
+    <div class="lane-header front">Frontstage</div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            Transparente para o usuário — a IA já "sabe" os termos, métricas e regras do time sem que o usuário precise explicar
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item new">
+            "Entendido. Vou considerar 'ativo' = login nos últimos 7 dias para suas análises. Quer que eu salve isso para próximas sessões?"
+        </div>
+    </div>
+
+    <div class="cell row-front">
+        <div class="cell-item exists">
+            IA responde com definições do glossário institucional, exemplos de uso e links para documentação no Confluence
+        </div>
+    </div>
+
+    <!-- BACKSTAGE ROW -->
+    <div class="lane-header back">Backstage</div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            IA consulta o Contexto de Negócio Institucional (glossário de métricas, regras de negócio, termos do time) armazenado como steering files ou base de conhecimento vinculada ao MCP Server
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item new">
+            IA armazena o contexto adicional no perfil do usuário (memória persistente por sessão ou por usuário) para reutilização futura
+        </div>
+    </div>
+
+    <div class="cell row-back">
+        <div class="cell-item exists">
+            IA consulta glossário corporativo no Astrolens (glossary terms) e documentação no Confluence via busca
+        </div>
+    </div>
+
+    <!-- SUPORTE ROW -->
+    <div class="lane-header support">Suporte</div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Base institucional com glossário de métricas, regras de negócio e termos específicos de cada time. Carregada automaticamente conforme o perfil do usuário." data-status="new">Base de Contexto Institucional</span>
+        <span class="service-tag new" data-detail="Arquivos de steering configurados por time/domínio que fornecem contexto de negócio à IA automaticamente." data-status="new">Steering files por time</span>
+        <span class="service-tag exists" data-detail="Astrolens fornece descrições de tabelas, domínios e glossary terms já cadastrados no catálogo de dados." data-status="exists">Astrolens</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Memória persistente por usuário que armazena definições e contextos específicos para reutilização em sessões futuras." data-status="new">Memória persistente</span>
+        <span class="service-tag new" data-detail="MCP Server de Dados que orquestra o armazenamento e recuperação do contexto do usuário." data-status="new">MCP Server de Dados</span>
+    </div>
+
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens glossary terms — termos de negócio cadastrados no catálogo corporativo de dados." data-status="exists">Astrolens (glossary)</span>
+        <span class="service-tag exists" data-detail="Confluence — documentação de negócio e wikis dos times, consultada via busca." data-status="exists">Confluence</span>
+        <span class="service-tag exists" data-detail="DataBot — assistente de linguagem natural já existente para consultas ao catálogo." data-status="exists">DataBot</span>
+    </div>
+
+</div>
+</div><!-- end slide-3 -->
+
+<!-- SLIDE 4: Exploração -->
+<div class="slide" id="slide-4">
+<h1>Etapa 4 — Exploração</h1>
+<p class="subtitle">Descoberta de dados disponíveis · DCP for Agents · Cenário Proposto</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Pergunta aberta</div>
+    <div class="moment-header">2. IA sugere caminhos</div>
+    <div class="moment-header">3. Navega pelo catálogo</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Pergunta aberta: "O que eu consigo saber sobre retenção?" ou "Quais dados existem sobre o comportamento dos creators?"</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Oferece sugestões proativas de exploração baseadas no perfil e no contexto do usuário</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Aprofunda: "Me conta mais sobre a tabela de retenção" ou "Quais colunas tem nessa tabela?"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item exists">IA responde com resumo das tabelas e métricas disponíveis sobre o tema, organizadas por relevância, com exemplos de perguntas já respondidas</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Com os dados disponíveis, você pode descobrir: (1) Taxa de retenção por cohort, (2) Creators ativos vs inativos, (3) Tempo médio até primeiro login. Quer aprofundar algum?"</div></div>
+    <div class="cell row-front"><div class="cell-item exists">IA mostra schema da tabela em linguagem acessível: colunas, significados, período de dados disponível, e quem é o owner</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens por domínio/tag, busca tabelas com descrições relevantes, e consulta queries anteriores do dataset</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA cruza o perfil do usuário (time, domínio) com as tabelas mais acessadas por aquele perfil e gera sugestões contextualizadas</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens (list_schema_fields, get_entities) para obter metadados completos da tabela</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens MCP busca por domínio, tags e descrições para encontrar tabelas relevantes ao tema." data-status="exists">Astrolens MCP</span>
+        <span class="service-tag exists" data-detail="Astrolens get_dataset_queries retorna queries anteriores do dataset para sugerir perguntas já feitas." data-status="exists">Astrolens (queries)</span>
+        <span class="service-tag new" data-detail="Base institucional com glossário de métricas e regras de negócio do time." data-status="new">Base de Contexto</span>
+    </div>
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Mapeamento de perfis (roles/times) aos datasources e tabelas mais acessadas." data-status="new">Profile Mapping</span>
+        <span class="service-tag exists" data-detail="Astrolens MCP retorna tabelas populares por domínio." data-status="exists">Astrolens MCP</span>
+        <span class="service-tag new" data-detail="Base de Contexto de Negócio Institucional com métricas e regras." data-status="new">Base de Contexto</span>
+    </div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens MCP Server para consulta de metadados completos das tabelas." data-status="exists">Astrolens MCP</span>
+    </div>
+</div>
+</div><!-- end slide-4 -->
+
+<!-- SLIDE 5: Pergunta -->
+<div class="slide" id="slide-5">
+<h1>Etapa 5 — Pergunta</h1>
+<p class="subtitle">Formulação e refinamento da pergunta de negócio · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Formula a pergunta</div>
+    <div class="moment-header">2. IA valida e refina</div>
+    <div class="moment-header">3. Usuário confirma</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Faz pergunta de negócio em linguagem natural: "Quantos creators ativos tivemos no último mês?"</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Analisa a pergunta, identifica ambiguidades e propõe refinamentos</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Esclarece: "Quem logou pelo menos 1x, nos últimos 30 dias corridos"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item exists">Campo de conversa na IDE aceita a pergunta como texto livre</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Quando diz 'creators ativos', quer dizer quem logou pelo menos 1x ou quem publicou conteúdo? E 'último mês' é maio/2026 ou os últimos 30 dias corridos?"</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Entendido. Vou buscar creators com pelo menos 1 login nos últimos 30 dias. Posso prosseguir?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">Nenhum processamento — recepção da mensagem</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA cruza termos da pergunta com glossário institucional (Astrolens glossary terms) e contexto do usuário (memória persistente) para detectar ambiguidades</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA registra a definição refinada e a associa à sessão para manter consistência nas próximas etapas</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude como interface conversacional para receber perguntas em linguagem natural." data-status="exists">Kiro / Claude</span></div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens glossary terms para validar termos de negócio." data-status="exists">Astrolens (glossary)</span>
+        <span class="service-tag new" data-detail="Base de Contexto de Negócio Institucional com definições do time." data-status="new">Base de Contexto</span>
+        <span class="service-tag new" data-detail="Memória persistente por usuário para recuperar definições anteriores." data-status="new">Memória persistente</span>
+    </div>
+    <div class="cell row-support">
+        <span class="service-tag new" data-detail="Memória persistente registra definições refinadas para consistência na sessão." data-status="new">Memória persistente</span>
+        <span class="service-tag new" data-detail="MCP Server de Dados armazena contexto da sessão." data-status="new">MCP Server de Dados</span>
+    </div>
+</div>
+</div><!-- end slide-5 -->
+
+<!-- SLIDE 6: Seleção da Base -->
+<div class="slide" id="slide-6">
+<h1>Etapa 6 — Seleção da Base</h1>
+<p class="subtitle">Identificação e escolha da tabela ideal · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Identifica tabelas candidatas</div>
+    <div class="moment-header">2. Apresenta opções</div>
+    <div class="moment-header">3. Usuário confirma</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>A partir da pergunta refinada, consulta o catálogo para identificar quais tabelas podem responder</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Apresenta as tabelas candidatas com explicação acessível e recomendação</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Confirma: "Vai com a Opção A" ou pede mais contexto: "Qual a diferença entre as duas?"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">"Encontrei 2 tabelas que podem responder sua pergunta. Vou te mostrar as opções."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Opção A: gold.creators_activity — tabela oficial, atualizada diariamente, score 92/100. Opção B: gold.user_sessions — mais granular, exige mais filtros. Recomendo A."</div></div>
+    <div class="cell row-front"><div class="cell-item exists">Se pede diferença, IA explica distinções (granularidade, período, colunas). Se confirma, prossegue para criação da query.</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens por tabelas relacionadas, filtra por datasources com acesso, ranqueia por relevância e qualidade (score Heimdall)</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA consultou metadados completos (descrição, owner, frequência de atualização, score de qualidade, linhagem) e formatou em linguagem acessível</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta linhagem (get_lineage) para explicar de onde vem cada tabela e como se relacionam</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens MCP para busca, get_entities e list_schema_fields." data-status="exists">Astrolens MCP</span>
+        <span class="service-tag exists" data-detail="Astrolens Heimdall fornece score de qualidade das tabelas." data-status="exists">Heimdall</span>
+        <span class="service-tag new" data-detail="Profile-to-Datasource Mapping filtra tabelas por acesso do usuário." data-status="new">Profile Mapping</span>
+    </div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens MCP get_entities com metadados de qualidade." data-status="exists">Astrolens MCP</span>
+        <span class="service-tag exists" data-detail="Astrolens Heimdall score de qualidade." data-status="exists">Heimdall</span>
+    </div>
+    <div class="cell row-support">
+        <span class="service-tag exists" data-detail="Astrolens MCP get_lineage para explicar origem e relação entre tabelas." data-status="exists">Astrolens (lineage)</span>
+    </div>
+</div>
+</div><!-- end slide-6 -->
+
+<!-- SLIDE 7: Criar Query -->
+<div class="slide" id="slide-7">
+<h1>Etapa 7 — Criar Query</h1>
+<p class="subtitle">Geração e refinamento da query SQL · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Expressa necessidade</div>
+    <div class="moment-header">2. IA consulta catálogo</div>
+    <div class="moment-header">3. IA gera query</div>
+    <div class="moment-header">4. Confirma ou refina</div>
+    <div class="moment-header">5. Erro e correção</div>
+    <div class="moment-header">6. Query pronta</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Não-técnico descreve em linguagem natural. Técnico escreve SQL diretamente.</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Recebe a pergunta e inicia construção da query consultando metadados</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Entrega query gerada com explicação</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Confirma, refina via conversa ("filtra só Brasil") ou edita SQL diretamente</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag user">Usuário</span><br>Recebe feedback de erro traduzido; IA gera correção automaticamente</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Confirma execução (não-técnico sem ver SQL, técnico após revisão)</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item exists">Campo de conversa na IDE (não-técnico) ou editor SQL do Astrobox (técnico)</div></div>
+    <div class="cell row-front"><div class="cell-item new">Indicador "consultando catálogo de dados..."</div></div>
+    <div class="cell row-front"><div class="cell-item new">Não-técnico: resumo em português do que a query faz. Técnico: SQL completo com comentários.</div></div>
+    <div class="cell row-front"><div class="cell-item new">Conversa de refinamento: IA ajusta query e mostra nova versão</div></div>
+    <div class="cell row-front"><div class="cell-item new">"A coluna 'user_active' não existe. Quis dizer 'is_active'?" + botão "Corrigir e executar"</div></div>
+    <div class="cell row-front"><div class="cell-item adaptation">Confirmação de execução com datasource e tempo estimado</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">Nenhum processamento ainda</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta schema, linhagem, queries anteriores e boas práticas do datasource</div></div>
+    <div class="cell row-back"><div class="cell-item new">Validação sintática antes de exibir (campos existem no schema?); detecção de campos inexistentes</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA reprocessa query com novo critério, re-valida contra o schema</div></div>
+    <div class="cell row-back"><div class="cell-item new">Error Translation Layer intercepta erro e converte em ação; IA gera versão corrigida (até 2 tentativas)</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">Query validada encaminhada para execução</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude e Astrobox Query Builder para entrada do usuário." data-status="exists">Kiro / Astrobox</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens MCP para schema, linhagem e queries anteriores." data-status="exists">Astrolens MCP</span> <span class="service-tag new" data-detail="Guia de boas práticas por datasource (Athena vs Redshift)." data-status="new">Guia Boas Práticas</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Validador SQL que checa sintaxe e existência de campos no schema." data-status="new">Validador SQL</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados para orquestração." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados reprocessa query." data-status="adaptation">MCP Server</span> <span class="service-tag new" data-detail="Validador SQL re-valida contra schema." data-status="new">Validador SQL</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Error Translation Layer converte erros técnicos em ações corrigíveis." data-status="new">Error Translation</span> <span class="service-tag adaptation" data-detail="MCP Server + Astrolens para correção." data-status="adaptation">MCP + Astrolens</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astrobox API recebe query validada para execução." data-status="adaptation">Astrobox API</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados orquestra envio." data-status="adaptation">MCP Server</span></div>
+</div>
+</div><!-- end slide-7 -->
+
+<!-- SLIDE 8: Executar Query -->
+<div class="slide" id="slide-8">
+<h1>Etapa 8 — Executar Query</h1>
+<p class="subtitle">Execução e retorno de resultados · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Envia para execução</div>
+    <div class="moment-header">2. Em andamento</div>
+    <div class="moment-header">3. Resultado retornado</div>
+    <div class="moment-header">4. Erro na execução</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Submete a query validada ao datasource correto via Astrobox API</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Monitora o status da execução</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Recebe o resultado e prepara para apresentação</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Intercepta erro de execução e traduz para o usuário</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">"Executando query no datasource DHI_DATA_GOLD... Tempo estimado: ~15 segundos"</div></div>
+    <div class="cell row-front"><div class="cell-item new">Barra de progresso; se demorar: "Está demorando mais que o usual. Quer que eu tente otimizar?"</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Query executada com sucesso. Retornou 1.247 linhas. Quer que eu analise os resultados?"</div></div>
+    <div class="cell row-front"><div class="cell-item new">"O datasource está indisponível" ou "Sem permissão. Quer que eu solicite acesso?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item adaptation">MCP Server chama Astrobox API com token do usuário (refresh automático se necessário)</div></div>
+    <div class="cell row-back"><div class="cell-item exists">Astrobox executor processa a query no engine do datasource (Athena, Redshift); MCP monitora timeout</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">MCP Server recebe resultado, armazena temporariamente para uso nas próximas etapas</div></div>
+    <div class="cell row-back"><div class="cell-item new">Error Translation Layer converte erro técnico (timeout, 403, syntax error) em ação corrigível</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox API para execução de queries." data-status="exists">Astrobox API</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados orquestra a chamada." data-status="adaptation">MCP Server</span> <span class="service-tag new" data-detail="OAuth2 Token Service com refresh automático." data-status="new">OAuth2 Svc</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="api-astrobox-executor processa query no engine." data-status="exists">Executor</span> <span class="service-tag adaptation" data-detail="MCP Server monitora timeout e status." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox API retorna resultado." data-status="exists">Astrobox API</span> <span class="service-tag adaptation" data-detail="MCP Server armazena resultado temporário." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Error Translation Layer converte erros em ações." data-status="new">Error Translation</span> <span class="service-tag new" data-detail="Access Request API para solicitar permissão." data-status="new">Access Req API</span></div>
+</div>
+</div><!-- end slide-8 -->
+
+<!-- SLIDE 9: Validação da Qualidade -->
+<div class="slide" id="slide-9">
+<h1>Etapa 9 — Validação da Qualidade do Dado</h1>
+<p class="subtitle">Checagem automática antes de apresentar resultados · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Validação automática</div>
+    <div class="moment-header">2. Alerta de qualidade</div>
+    <div class="moment-header">3. Decisão do usuário</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Antes de entregar o resultado, executa checagens básicas de qualidade</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Sinaliza ao usuário que algo merece atenção antes de confiar no resultado</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Aceita com ressalva, pede fonte alternativa, ou consulta o owner da tabela</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">Transparente — o usuário não vê essa etapa a menos que algo esteja errado</div></div>
+    <div class="cell row-front"><div class="cell-item new">"⚠️ Tabela não atualizada há 3 dias. Dados podem estar defasados. Prosseguir?"</div></div>
+    <div class="cell row-front"><div class="cell-item exists">Opções: "Prosseguir" / "Buscar alternativa" / "Quem é o responsável?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item new">Verifica: resultado vazio? Valores fora do range? Nulos excessivos? Consulta score Heimdall</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA cruzou metadados de freshness do Astrolens com o resultado retornado</div></div>
+    <div class="cell row-back"><div class="cell-item exists">Se pede alternativa, retorna para Seleção da Base; se pede owner, consulta Astrolens</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens Heimdall fornece score de qualidade." data-status="exists">Heimdall</span> <span class="service-tag new" data-detail="Validação automática de resultados (nulos, freshness, range)." data-status="new">Validação auto.</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens MCP metadados de freshness e owner." data-status="exists">Astrolens MCP</span> <span class="service-tag new" data-detail="Validação automática de resultados." data-status="new">Validação auto.</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens MCP get_entities para consultar owner." data-status="exists">Astrolens MCP</span></div>
+</div>
+</div><!-- end slide-9 -->
+
+<!-- SLIDE 10: Gerar Insights -->
+<div class="slide" id="slide-10">
+<h1>Etapa 10 — Gerar Insights</h1>
+<p class="subtitle">Interpretação dos dados e geração de insights · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Primeira leitura</div>
+    <div class="moment-header">2. Nível de confiança</div>
+    <div class="moment-header">3. Aprofundamento</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Interpreta os dados retornados e produz insights iniciais</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Acompanha cada insight com fonte e nível de confiança</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Pede mais detalhes: "Detalha essa queda nos creators novos" ou "Compara com ano passado"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">"1.247 creators ativos — queda de 8%. Concentrada em contas novas. Pico nas segundas."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Confiança alta — tabela oficial, score 92/100" ou "Confiança média — possível sazonalidade"</div></div>
+    <div class="cell row-front"><div class="cell-item new">IA gera nova análise focada no recorte pedido, podendo criar query adicional</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item new">IA aplica análise estatística básica (tendências, outliers, distribuições); cruza com contexto de negócio</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA consulta score Heimdall e aplica heurísticas de confiança (amostra, completude, freshness)</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">Se precisa de dados novos, retorna para Criar Query; se não, analisa diretamente</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados para processamento de resultados." data-status="adaptation">MCP Server</span> <span class="service-tag new" data-detail="Base de Contexto de Negócio para dar significado aos números." data-status="new">Base de Contexto</span> <span class="service-tag exists" data-detail="Kiro / Claude capacidade analítica nativa." data-status="exists">Kiro / Claude</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens Heimdall score de qualidade." data-status="exists">Heimdall</span> <span class="service-tag new" data-detail="Validação automática de resultados." data-status="new">Validação auto.</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span> <span class="service-tag exists" data-detail="Astrobox API para execução de queries adicionais." data-status="exists">Astrobox API</span></div>
+</div>
+</div><!-- end slide-10 -->
+
+<!-- SLIDE 11: Análise Crítica -->
+<div class="slide" id="slide-11">
+<h1>Etapa 11 — Análise Crítica</h1>
+<p class="subtitle">Validação analítica e rastreabilidade · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. IA como par de análise</div>
+    <div class="moment-header">2. Validação pelo usuário</div>
+    <div class="moment-header">3. Rastreabilidade</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Sugere proativamente perguntas de validação e sinaliza possíveis vieses</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Aceita sugestões, descarta ou pede novas segmentações</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Mantém histórico estruturado da conversa analítica</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">"Considere: (1) Queda pode ser sazonal — comparar com maio/2025? (2) Filtro de login pode excluir app mobile. (3) Segmentar por país?"</div></div>
+    <div class="cell row-front"><div class="cell-item new">IA executa validação solicitada e retorna resultado comparativo ou segmentado</div></div>
+    <div class="cell row-front"><div class="cell-item new">Usuário pode pedir: "Resume o que descobrimos" → resumo estruturado de perguntas → dados → conclusões</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item new">IA aplica checklist de validação analítica (sazonalidade, viés de seleção, causalidade, segmentação)</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">Se precisa de dados novos, retorna para Criar Query→Executar→Insights</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA mantém log estruturado da sessão (perguntas, queries, insights, validações)</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Checklist de validação analítica (sazonalidade, viés, causalidade)." data-status="new">Checklist validação</span> <span class="service-tag new" data-detail="Base de Contexto de Negócio." data-status="new">Base de Contexto</span> <span class="service-tag exists" data-detail="Kiro / Claude raciocínio analítico." data-status="exists">Kiro / Claude</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span> <span class="service-tag exists" data-detail="Astrobox API." data-status="exists">Astrobox API</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Memória persistente por usuário para rastreabilidade." data-status="new">Memória persistente</span> <span class="service-tag exists" data-detail="Kiro / Claude histórico de sessão." data-status="exists">Kiro / Claude</span></div>
+</div>
+</div><!-- end slide-11 -->
+
+<!-- SLIDE 12: Gerar Saídas -->
+<div class="slide" id="slide-12">
+<h1>Etapa 12 — Gerar Saídas</h1>
+<p class="subtitle">Criação de artefatos (dashboards, documentos, CSV) · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Define formato</div>
+    <div class="moment-header">2. IA gera artefato</div>
+    <div class="moment-header">3. Refinamento</div>
+    <div class="moment-header">4. Finalização</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Indica formato: dashboard, documento, CSV, relatório HTML</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Produz o artefato no formato solicitado</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Revisa e pede ajustes: "Muda pra barras" / "Simplifica o texto"</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Aprova o artefato: "Ficou bom, pode salvar"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item exists">IA confirma formato e pergunta detalhes: "Dashboard no Astrobox ou protótipo local?"</div></div>
+    <div class="cell row-front"><div class="cell-item new">Dashboard no Astrobox, documento formatado, código Streamlit, ou CSV exportado</div></div>
+    <div class="cell row-front"><div class="cell-item new">Ciclo de refinamento até o usuário aprovar</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Salvo! Link: [URL]. Quer compartilhar com alguém?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">IA identifica tipo de artefato e seleciona fluxo de geração adequado</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">IA chama Astrobox API para criar dashboard, ou gera código Streamlit (Vizzy), ou formata documento</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">IA regenera artefato com alterações, mantendo consistência com dados originais</div></div>
+    <div class="cell row-back"><div class="cell-item new">Artefato persistido com metadados (quem, quando, pergunta, fonte de dados)</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude interface conversacional." data-status="exists">Kiro / Claude</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astrobox API para criar query e dashboard." data-status="adaptation">Astrobox API</span> <span class="service-tag exists" data-detail="Vizzy para dashboards Streamlit." data-status="exists">Vizzy</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astrobox API para ajustes." data-status="adaptation">Astrobox API</span> <span class="service-tag exists" data-detail="Kiro / Claude." data-status="exists">Kiro / Claude</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox persistência de dashboards." data-status="exists">Astrobox</span> <span class="service-tag new" data-detail="Registro de metadados da análise." data-status="new">Registro metadados</span></div>
+</div>
+</div><!-- end slide-12 -->
+
+<!-- SLIDE 13: Distribuição e Gestão do Conhecimento -->
+<div class="slide" id="slide-13">
+<h1>Etapa 13 — Distribuição e Gestão do Conhecimento</h1>
+<p class="subtitle">Compartilhamento e indexação para encontrabilidade · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Define destinatários</div>
+    <div class="moment-header">2. Distribuição</div>
+    <div class="moment-header">3. Registro para encontrabilidade</div>
+    <div class="moment-header">4. Busca futura</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Indica para quem enviar e em qual canal</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Executa a distribuição nos canais indicados</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Indexa a análise com metadados para encontrabilidade futura</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Outro usuário pergunta: "Alguém já analisou retenção de creators?"</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item exists">IA confirma canais e destinatários antes de enviar</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Dashboard compartilhado com Growth. Resumo enviado no Google Chat."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Registrei no catálogo. Outros podem encontrar buscando por 'creators ativos'."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Sim, [nome] analisou em [data]. Quer ver ou refazer com dados atualizados?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item exists">IA identifica canais de distribuição e prepara envio</div></div>
+    <div class="cell row-back"><div class="cell-item exists">IA chama Astrobox API para compartilhar; Google Chat API para enviar resumo</div></div>
+    <div class="cell row-back"><div class="cell-item new">Registro no Índice: quem fez, quando, pergunta, tabela, conclusão, link</div></div>
+    <div class="cell row-back"><div class="cell-item new">IA consulta o Índice de Análises Realizadas e retorna resultados relevantes</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude." data-status="exists">Kiro / Claude</span> <span class="service-tag exists" data-detail="Astrobox compartilhamento de recursos." data-status="exists">Astrobox</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox compartilhamento." data-status="exists">Astrobox</span> <span class="service-tag exists" data-detail="Astroflow envio via Google Chat." data-status="exists">Astroflow</span> <span class="service-tag exists" data-detail="Google Chat API." data-status="exists">Google Chat</span> <span class="service-tag new" data-detail="Registro de metadados da análise." data-status="new">Registro metadados</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Índice de Análises Realizadas para encontrabilidade futura." data-status="new">Índice Análises</span> <span class="service-tag exists" data-detail="Astrolens tags e domínios." data-status="exists">Astrolens</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Índice de Análises Realizadas." data-status="new">Índice Análises</span></div>
+</div>
+</div><!-- end slide-13 -->
+
+<!-- SLIDE 14: Automação -->
+<div class="slide" id="slide-14">
+<h1>Etapa 14 — Automação</h1>
+<p class="subtitle">Recorrência, validação e detecção de anomalias · DCP for Agents</p>
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot exists"></div> Já existe</div>
+    <div class="legend-item"><div class="legend-dot adaptation"></div> Adaptação do existente</div>
+    <div class="legend-item"><div class="legend-dot new"></div> Novo serviço</div>
+    <div class="legend-item"><span class="actor-tag user">Usuário</span></div>
+    <div class="legend-item"><span class="actor-tag ai">IA</span></div>
+</div>
+<div class="blueprint" style="grid-template-columns: 130px 1fr 1fr 1fr 1fr 1fr;">
+    <div class="lane-header" style="background: #f8f9fa; color: #495057;">LANE</div>
+    <div class="moment-header">1. Identifica recorrência</div>
+    <div class="moment-header">2. Monta fluxo</div>
+    <div class="moment-header">3. DA valida</div>
+    <div class="moment-header">4. Ativação</div>
+    <div class="moment-header">5. Detecção de anomalia</div>
+    <div class="lane-header actor">Ator</div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Sinaliza que quer tornar a análise recorrente</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Cria workflow de automação no Astroflow</div></div>
+    <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>DA/AE revisa query, critérios e destino; aprova ou sugere ajustes</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Notifica que automação foi aprovada e ativada</div></div>
+    <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag ai">IA</span><br>Detecta resultado fora do padrão e alerta o usuário</div></div>
+    <div class="lane-header front">Frontstage</div>
+    <div class="cell row-front"><div class="cell-item new">"Posso automatizar. Roda toda segunda às 9h, envia no Chat. Um DA valida antes."</div></div>
+    <div class="cell row-front"><div class="cell-item new">Resumo: Trigger → Query → Resumo → Envio. Status: aguardando validação.</div></div>
+    <div class="cell row-front"><div class="cell-item exists">Notificação ao DA: "Nova automação por [nome]. Query: [link]. Aprovar / Rejeitar."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"Aprovada! Próxima execução: segunda às 9h."</div></div>
+    <div class="cell row-front"><div class="cell-item new">"⚠️ Queda de 25% — acima da variação normal (±8%). Quer investigar?"</div></div>
+    <div class="lane-header back">Backstage</div>
+    <div class="cell row-back"><div class="cell-item adaptation">IA identifica componentes: query, frequência, destino, critérios de alerta</div></div>
+    <div class="cell row-back"><div class="cell-item adaptation">IA chama Astroflow API para criar automação em modo draft pendente de validação</div></div>
+    <div class="cell row-back"><div class="cell-item new">Sistema de validação registra solicitação, associa ao DA responsável, aguarda aprovação</div></div>
+    <div class="cell row-back"><div class="cell-item exists">Astroflow publica automação; scheduler assume execução recorrente</div></div>
+    <div class="cell row-back"><div class="cell-item new">Compara resultado atual com histórico e aplica threshold de alerta configurado</div></div>
+    <div class="lane-header support">Suporte</div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude." data-status="exists">Kiro / Claude</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astroflow criação de automações via API." data-status="adaptation">Astroflow API</span> <span class="service-tag exists" data-detail="Astrobox API execução agendada." data-status="exists">Astrobox API</span> <span class="service-tag exists" data-detail="Google Chat API." data-status="exists">Google Chat</span></div>
+    <div class="cell row-support"><span class="service-tag new" data-detail="Sistema de validação de automações com aprovação do DA." data-status="new">Validação automações</span> <span class="service-tag exists" data-detail="Jira / Google Chat para notificação." data-status="exists">Jira / Chat</span></div>
+    <div class="cell row-support"><span class="service-tag exists" data-detail="Astroflow scheduler, execução e distribuição." data-status="exists">Astroflow</span> <span class="service-tag exists" data-detail="Astrobox API." data-status="exists">Astrobox API</span></div>
+    <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astroflow step de processamento com IA." data-status="adaptation">Astroflow (IA)</span> <span class="service-tag new" data-detail="Detecção de anomalias em resultados recorrentes." data-status="new">Detecção anomalias</span></div>
+</div>
+</div><!-- end slide-14 -->
+
+</div><!-- end slides-container -->
+
+<div id="chip-popover" class="chip-popover">
+    <div class="popover-title"></div>
+    <div class="popover-body"></div>
+    <span class="popover-status"></span>
+</div>
+
+<script>
+    // Slide navigation
+    const slides = [
+        { name: 'Instalação do Power de Dados', next: 'Setup do Ambiente' },
+        { name: 'Setup do Ambiente', next: 'Carga do Contexto de Negócio' },
+        { name: 'Carga do Contexto de Negócio', next: 'Exploração' },
+        { name: 'Exploração', next: 'Pergunta' },
+        { name: 'Pergunta', next: 'Seleção da Base' },
+        { name: 'Seleção da Base', next: 'Criar Query' },
+        { name: 'Criar Query', next: 'Executar Query' },
+        { name: 'Executar Query', next: 'Validação da Qualidade' },
+        { name: 'Validação da Qualidade', next: 'Gerar Insights' },
+        { name: 'Gerar Insights', next: 'Análise Crítica' },
+        { name: 'Análise Crítica', next: 'Gerar Saídas' },
+        { name: 'Gerar Saídas', next: 'Distribuição e Gestão do Conhecimento' },
+        { name: 'Distribuição e Gestão do Conhecimento', next: 'Automação' },
+        { name: 'Automação', next: null }
+    ];
+    let currentSlide = 0;
+
+    function updateNav() {
+        const btnBack = document.getElementById('btnBack');
+        const btnNext = document.getElementById('btnNext');
+        const navLabel = document.getElementById('navLabel');
+        const navNextName = document.getElementById('navNextName');
+
+        if (currentSlide === 0) {
+            btnBack.classList.add('hidden');
+        } else {
+            btnBack.classList.remove('hidden');
+        }
+
+        if (currentSlide < slides.length - 1) {
+            navLabel.style.visibility = 'visible';
+            btnNext.style.visibility = 'visible';
+            navNextName.textContent = slides[currentSlide].next;
+        } else {
+            navLabel.style.visibility = 'hidden';
+            btnNext.style.visibility = 'hidden';
+        }
+
+        // Update step dots
+        document.querySelectorAll('.step-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        const container = document.getElementById('slidesContainer');
+        container.style.transform = 'translateX(-' + (index * (100 / 14)) + '%)';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        updateNav();
+    }
+
+    function goToNext() {
+        if (currentSlide < slides.length - 1) goToSlide(currentSlide + 1);
+    }
+
+    function goToPrev() {
+        if (currentSlide > 0) goToSlide(currentSlide - 1);
+    }
+
+    updateNav();
+
+    // Chip popover
+    const popover = document.getElementById('chip-popover');
+    let activeTag = null;
+
+    document.querySelectorAll('.service-tag[data-detail]').forEach(tag => {
+        tag.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (activeTag === tag) {
+                popover.style.display = 'none';
+                activeTag = null;
+                return;
+            }
+            activeTag = tag;
+
+            const rect = tag.getBoundingClientRect();
+            popover.querySelector('.popover-title').textContent = tag.textContent.trim();
+            popover.querySelector('.popover-body').textContent = tag.getAttribute('data-detail');
+
+            const statusEl = popover.querySelector('.popover-status');
+            const status = tag.getAttribute('data-status');
+            statusEl.className = 'popover-status ' + status;
+            statusEl.textContent = status === 'new' ? 'Serviço novo' : status === 'exists' ? 'Já existe' : 'Adaptação';
+
+            popover.style.display = 'block';
+
+            let top = rect.top - popover.getBoundingClientRect().height - 10;
+            let left = rect.left;
+            if (top < 10) top = rect.bottom + 10;
+            if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
+
+            popover.style.top = top + 'px';
+            popover.style.left = left + 'px';
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.service-tag[data-detail]') && !e.target.closest('.chip-popover')) {
+            popover.style.display = 'none';
+            activeTag = null;
+        }
+    });
+</script>
+
+</body>
+</html>
