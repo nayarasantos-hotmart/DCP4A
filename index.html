@@ -100,6 +100,7 @@
         .lane-header.action { background: #fff3e0; color: #e65100; }
         .lane-header.front { background: #fff3e0; color: #e65100; }
         .lane-header.back { background: #f3e5f5; color: #6a1b9a; }
+        .lane-header.semantic { background: #e3f2fd; color: #0d47a1; }
         .lane-header.support { background: #fce4ec; color: #c62828; }
 
         .moment-header {
@@ -236,6 +237,23 @@
             gap: 6px;
             align-content: flex-start;
         }
+
+        .row-semantic .cell-item { border-left-color: #1565c0; }
+
+        .owner-tag {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 700;
+            margin-top: 6px;
+            margin-right: 4px;
+        }
+
+        .owner-tag.da { background: #e8f5e9; color: #2e7d32; }
+        .owner-tag.de { background: #fff3e0; color: #e65100; }
+        .owner-tag.pm { background: #f3e5f5; color: #6a1b9a; }
+        .owner-tag.gov { background: #fce4ec; color: #c62828; }
 
         .empty-cell {
             color: #adb5bd;
@@ -589,6 +607,15 @@
         </div>
     </div>
 
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+
     <!-- SUPORTE ROW -->
     <div class="lane-header support">Suporte</div>
 
@@ -717,6 +744,12 @@
         </div>
     </div>
 
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+
     <!-- SUPORTE ROW -->
     <div class="lane-header support">Suporte</div>
 
@@ -828,6 +861,12 @@
         </div>
     </div>
 
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Catálogo de métricas por domínio/perfil — lista de métricas canônicas com definições executáveis (SQL embutido, não texto descritivo).<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag pm">Product Manager</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Mecanismo de override temporário — permite divergência de sessão sem alterar definição oficial.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Glossário executável — cada termo de negócio vinculado à lógica SQL correspondente (métrica + dimensões + filtros).<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+
     <!-- SUPORTE ROW -->
     <div class="lane-header support">Suporte</div>
 
@@ -879,6 +918,11 @@
     <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens por domínio/tag, busca tabelas com descrições relevantes, e consulta queries anteriores do dataset</div></div>
     <div class="cell row-back"><div class="cell-item new">IA cruza o perfil do usuário (time, domínio) com as tabelas mais acessadas por aquele perfil e gera sugestões contextualizadas</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens (list_schema_fields, get_entities) para obter metadados completos da tabela</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Métricas registradas por domínio — catálogo navegável de métricas disponíveis para o perfil do usuário.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag pm">Product Manager</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Dimensões disponíveis por métrica — lista de recortes possíveis (país, plano, cohort) vinculados a cada métrica.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Relações entre entidades — mapeamento de como métricas se conectam (creator → transaction → subscription).<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support">
         <span class="service-tag exists" data-detail="Astrolens MCP busca por domínio, tags e descrições para encontrar tabelas relevantes ao tema." data-status="exists">Astrolens MCP</span>
@@ -924,6 +968,11 @@
     <div class="cell row-back"><div class="cell-item exists">Nenhum processamento — recepção da mensagem</div></div>
     <div class="cell row-back"><div class="cell-item new">IA cruza termos da pergunta com glossário institucional (Astrolens glossary terms) e contexto do usuário (memória persistente) para detectar ambiguidades</div></div>
     <div class="cell row-back"><div class="cell-item new">IA registra a definição refinada e a associa à sessão para manter consistência nas próximas etapas</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Definição canônica de termos — cada termo de negócio tem uma única definição oficial com lógica SQL associada.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag pm">Product Manager</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Registro de overrides por sessão — armazena divergências temporárias sem alterar a definição oficial.<br><span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude como interface conversacional para receber perguntas em linguagem natural." data-status="exists">Kiro / Claude</span></div>
     <div class="cell row-support">
@@ -966,6 +1015,11 @@
     <div class="cell row-back"><div class="cell-item exists">IA consulta Astrolens por tabelas relacionadas, filtra por datasources com acesso, ranqueia por relevância e qualidade (score Heimdall)</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA consultou metadados completos (descrição, owner, frequência de atualização, score de qualidade, linhagem) e formatou em linguagem acessível</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA consulta linhagem (get_lineage) para explicar de onde vem cada tabela e como se relacionam</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Mapeamento métrica → tabela fonte — cada métrica tem sua tabela de origem definida no modelo semântico.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Regras de prioridade entre fontes — quando há múltiplas tabelas, critérios de escolha (freshness, granularidade, score).<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag gov">Governance</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Metadados de qualidade por fonte — score, SLA de atualização e owner vinculados a cada tabela mapeada.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support">
         <span class="service-tag exists" data-detail="Astrolens MCP para busca, get_entities e list_schema_fields." data-status="exists">Astrolens MCP</span>
@@ -1022,6 +1076,14 @@
     <div class="cell row-back"><div class="cell-item new">IA reprocessa query com novo critério, re-valida contra o schema</div></div>
     <div class="cell row-back"><div class="cell-item new">Error Translation Layer intercepta erro e converte em ação; IA gera versão corrigida (até 2 tentativas)</div></div>
     <div class="cell row-back"><div class="cell-item adaptation">Query validada encaminhada para execução</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Modelo semântico com métricas, dimensões e joins pré-definidos — base para compilação de queries.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Compilador SQL — motor que traduz requests semânticos em SQL otimizado por engine (Athena/Redshift). Inclui boas práticas e filtros obrigatórios.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">API de request semântico — interface que aceita {métrica + dimensão + filtro} e permite adição incremental sem reescrita.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Validação na compilação — rejeita requests com métricas/dimensões inexistentes antes de gerar SQL.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Política de acesso por métrica — controle de quem pode consultar quais métricas/dimensões.<br><span class="owner-tag gov">Governance</span> <span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude e Astrobox Query Builder para entrada do usuário." data-status="exists">Kiro / Astrobox</span></div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens MCP para schema, linhagem e queries anteriores." data-status="exists">Astrolens MCP</span> <span class="service-tag new" data-detail="Guia de boas práticas por datasource (Athena vs Redshift)." data-status="new">Guia Boas Práticas</span></div>
@@ -1064,6 +1126,12 @@
     <div class="cell row-back"><div class="cell-item exists">Astrobox executor processa a query no engine do datasource (Athena, Redshift); MCP monitora timeout</div></div>
     <div class="cell row-back"><div class="cell-item adaptation">MCP Server recebe resultado, armazena temporariamente para uso nas próximas etapas</div></div>
     <div class="cell row-back"><div class="cell-item new">Error Translation Layer converte erro técnico (timeout, 403, syntax error) em ação corrigível</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">SQL compilado e validado — query gerada pela layer, correta por construção e otimizada para o engine alvo.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Camada de cache — resultados pré-computados para métricas populares, evitando re-execução desnecessária.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox API para execução de queries." data-status="exists">Astrobox API</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados orquestra a chamada." data-status="adaptation">MCP Server</span> <span class="service-tag new" data-detail="OAuth2 Token Service com refresh automático." data-status="new">OAuth2 Svc</span></div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="api-astrobox-executor processa query no engine." data-status="exists">Executor</span> <span class="service-tag adaptation" data-detail="MCP Server monitora timeout e status." data-status="adaptation">MCP Server</span></div>
@@ -1100,6 +1168,11 @@
     <div class="cell row-back"><div class="cell-item new">Verifica: resultado vazio? Valores fora do range? Nulos excessivos? Consulta score Heimdall</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA cruzou metadados de freshness do Astrolens com o resultado retornado</div></div>
     <div class="cell row-back"><div class="cell-item exists">Se pede alternativa, retorna para Seleção da Base; se pede owner, consulta Astrolens</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Quality rules por métrica — freshness_max, expected_range, null_threshold definidos junto com cada métrica.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Metadados de qualidade estruturados — freshness, completude e score retornados junto com cada resultado.<br><span class="owner-tag da">Data Analyst</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens Heimdall fornece score de qualidade." data-status="exists">Heimdall</span> <span class="service-tag new" data-detail="Validação automática de resultados (nulos, freshness, range)." data-status="new">Validação auto.</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens MCP metadados de freshness e owner." data-status="exists">Astrolens MCP</span> <span class="service-tag new" data-detail="Validação automática de resultados." data-status="new">Validação auto.</span></div>
@@ -1135,6 +1208,11 @@
     <div class="cell row-back"><div class="cell-item new">IA aplica análise estatística básica (tendências, outliers, distribuições); cruza com contexto de negócio</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA consulta score Heimdall e aplica heurísticas de confiança (amostra, completude, freshness)</div></div>
     <div class="cell row-back"><div class="cell-item adaptation">Se precisa de dados novos, retorna para Criar Query; se não, analisa diretamente</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Metadados de rastreabilidade — cada resultado vinculado à métrica canônica, definição SQL e tabela fonte usada.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Indicadores de confiança — freshness, score de qualidade e completude retornados como atributos do resultado.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Suporte a offset temporal — parâmetro de comparação (ex: offset_window: 30d, 365d) embutido nas métricas.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados para processamento de resultados." data-status="adaptation">MCP Server</span> <span class="service-tag new" data-detail="Base de Contexto de Negócio para dar significado aos números." data-status="new">Base de Contexto</span> <span class="service-tag exists" data-detail="Kiro / Claude capacidade analítica nativa." data-status="exists">Kiro / Claude</span></div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrolens Heimdall score de qualidade." data-status="exists">Heimdall</span> <span class="service-tag new" data-detail="Validação automática de resultados." data-status="new">Validação auto.</span></div>
@@ -1170,6 +1248,11 @@
     <div class="cell row-back"><div class="cell-item new">IA aplica checklist de validação analítica (sazonalidade, viés de seleção, causalidade, segmentação)</div></div>
     <div class="cell row-back"><div class="cell-item adaptation">Se precisa de dados novos, retorna para Criar Query→Executar→Insights</div></div>
     <div class="cell row-back"><div class="cell-item new">IA mantém log estruturado da sessão (perguntas, queries, insights, validações)</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Dimensões como parâmetros adicionáveis — catálogo de dimensões que podem ser combinadas com qualquer métrica compatível.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Métricas derivadas — definições compostas (ex: churn = previous_active - current_active / previous_active) reutilizáveis.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Log de auditoria — registro de qual métrica, definição e versão foi usada em cada análise.<br><span class="owner-tag de">Data Engineer</span> <span class="owner-tag gov">Governance</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag new" data-detail="Checklist de validação analítica (sazonalidade, viés, causalidade)." data-status="new">Checklist validação</span> <span class="service-tag new" data-detail="Base de Contexto de Negócio." data-status="new">Base de Contexto</span> <span class="service-tag exists" data-detail="Kiro / Claude raciocínio analítico." data-status="exists">Kiro / Claude</span></div>
     <div class="cell row-support"><span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span> <span class="service-tag exists" data-detail="Astrobox API." data-status="exists">Astrobox API</span></div>
@@ -1209,6 +1292,12 @@
     <div class="cell row-back"><div class="cell-item adaptation">IA chama Astrobox API para criar dashboard, ou gera código Streamlit (Vizzy), ou formata documento</div></div>
     <div class="cell row-back"><div class="cell-item adaptation">IA regenera artefato com alterações, mantendo consistência com dados originais</div></div>
     <div class="cell row-back"><div class="cell-item new">Artefato persistido com metadados (quem, quando, pergunta, fonte de dados)</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Definição única de métrica consumida por múltiplos formatos — mesma lógica para dashboard, CSV e relatório.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Versionamento de definições — artefatos vinculados à versão da métrica usada; atualizações propagam automaticamente.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude interface conversacional." data-status="exists">Kiro / Claude</span></div>
     <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astrobox API para criar query e dashboard." data-status="adaptation">Astrobox API</span> <span class="service-tag exists" data-detail="Vizzy para dashboards Streamlit." data-status="exists">Vizzy</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
@@ -1249,6 +1338,12 @@
     <div class="cell row-back"><div class="cell-item exists">IA chama Astrobox API para compartilhar; Google Chat API para enviar resumo</div></div>
     <div class="cell row-back"><div class="cell-item new">Registro no Índice: quem fez, quando, pergunta, tabela, conclusão, link</div></div>
     <div class="cell row-back"><div class="cell-item new">IA consulta o Índice de Análises Realizadas e retorna resultados relevantes</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Índice de uso por métrica — registro de quais análises consumiram cada métrica, com período e dimensões usadas.<br><span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Grafo de dependência — mapa de quais artefatos dependem de quais métricas (para impacto de mudanças).<br><span class="owner-tag de">Data Engineer</span> <span class="owner-tag da">Data Analyst</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude." data-status="exists">Kiro / Claude</span> <span class="service-tag exists" data-detail="Astrobox compartilhamento de recursos." data-status="exists">Astrobox</span></div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Astrobox compartilhamento." data-status="exists">Astrobox</span> <span class="service-tag exists" data-detail="Astroflow envio via Google Chat." data-status="exists">Astroflow</span> <span class="service-tag exists" data-detail="Google Chat API." data-status="exists">Google Chat</span> <span class="service-tag new" data-detail="Registro de metadados da análise." data-status="new">Registro metadados</span></div>
@@ -1293,6 +1388,13 @@
     <div class="cell row-back"><div class="cell-item new">Sistema de validação registra solicitação, associa ao DA responsável, aguarda aprovação</div></div>
     <div class="cell row-back"><div class="cell-item exists">Astroflow publica automação; scheduler assume execução recorrente</div></div>
     <div class="cell row-back"><div class="cell-item new">Compara resultado atual com histórico e aplica threshold de alerta configurado</div></div>
+    <!-- SEMANTIC LAYER ROW -->
+    <div class="lane-header semantic">Semantic Layer</div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Referência a métricas (não queries) — automações vinculadas à métrica canônica; evolução da definição propaga automaticamente.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Governança de métricas em automações — flag de "métrica aprovada para recorrência" com validação estrutural.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag gov">Governance</span></div></div>
+    <div class="cell row-semantic"><div class="cell-item" style="border-left-color: #90caf9; background: #f5f5f5; color: #9e9e9e; font-style: italic;">—</div></div>
+    <div class="cell row-semantic"><div class="cell-item new" style="border-left-color: #1565c0;">Thresholds de anomalia por métrica — limites de variação normal (ex: ±8%) definidos como atributo da métrica.<br><span class="owner-tag da">Data Analyst</span> <span class="owner-tag de">Data Engineer</span></div></div>
     <div class="lane-header support">Suporte</div>
     <div class="cell row-support"><span class="service-tag exists" data-detail="Kiro / Claude." data-status="exists">Kiro / Claude</span> <span class="service-tag adaptation" data-detail="MCP Server de Dados." data-status="adaptation">MCP Server</span></div>
     <div class="cell row-support"><span class="service-tag adaptation" data-detail="Astroflow criação de automações via API." data-status="adaptation">Astroflow API</span> <span class="service-tag exists" data-detail="Astrobox API execução agendada." data-status="exists">Astrobox API</span> <span class="service-tag exists" data-detail="Google Chat API." data-status="exists">Google Chat</span></div>
