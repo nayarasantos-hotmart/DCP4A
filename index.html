@@ -1072,12 +1072,12 @@
     <div class="cell row-actor"><div class="cell-item new"><span class="actor-tag user">Usuário</span><br>Recebe feedback de erro traduzido; IA gera correção automaticamente</div></div>
     <div class="cell row-actor"><div class="cell-item exists"><span class="actor-tag user">Usuário</span><br>Confirma execução (não-técnico sem ver SQL, técnico após revisão)</div></div>
     <div class="lane-header front">Frontstage</div>
-    <div class="cell row-front"><div class="cell-item exists">Campo de conversa na IDE (não-técnico) ou editor SQL do Astrobox (técnico)</div></div>
+    <div class="cell row-front"><div class="cell-item exists">Conversa na IDE — não-técnico descreve em linguagem natural; técnico pode colar SQL diretamente no chat</div></div>
     <div class="cell row-front"><div class="cell-item new">Indicador "consultando catálogo de dados..."</div></div>
-    <div class="cell row-front"><div class="cell-item new">Não-técnico: resumo em português do que a query faz. Técnico: SQL completo com comentários.</div></div>
+    <div class="cell row-front"><div class="cell-item new">IA responde com o SQL gerado + explicação em linguagem natural do que a query faz. Técnico revisa o SQL; não-técnico foca na explicação.</div></div>
     <div class="cell row-front"><div class="cell-item new">Conversa de refinamento: IA ajusta query e mostra nova versão</div></div>
     <div class="cell row-front"><div class="cell-item new">"A coluna 'user_active' não existe. Quis dizer 'is_active'?" + botão "Corrigir e executar"</div></div>
-    <div class="cell row-front"><div class="cell-item adaptation">Confirmação de execução com datasource e tempo estimado</div></div>
+    <div class="cell row-front"><div class="cell-item adaptation">"Posso executar?" — com datasource, tempo estimado e opção de copiar o SQL para uso externo (ex: Astrobox)</div></div>
     <div class="lane-header back">Backstage</div>
     <div class="cell row-back"><div class="cell-item exists">Nenhum processamento ainda</div></div>
     <div class="cell row-back"><div class="cell-item exists">IA consulta schema, linhagem, queries anteriores e boas práticas do datasource</div></div>
